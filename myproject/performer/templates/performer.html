@@ -1,0 +1,16 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<section><h2>Исполнители</h2></section>
+<div class="performer-user-cont">
+    {% for user in performer_users %}
+    <div class="performer-user">
+        <p>{{user.user.role}}: {{user.user.username}}</p>
+        <p>Имя: {{user.user.first_name}}</p>
+        <p>Фамилия: {{user.user.last_name}}</p>
+        <p>Опыт: {{user.experience}}</p>
+        <p>Контакты: {{user.contact_info}}</p>
+    </div>
+    {% endfor %}
+</div>
+{% endblock %}
