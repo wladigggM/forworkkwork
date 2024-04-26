@@ -32,7 +32,7 @@
         <ul class="nav-links">
             <li><a href="/">Главная</a></li>
             <li><a href="#">Категории</a></li>
-            <li><a href="{% url 'performer:performer' %}">Исполнители</a></li>
+            <li><a href="{% url 'users:performer' %}">Исполнители</a></li>
             <li><a href="#">Заказы</a></li>
             {% if user.is_staff %}
             <li><a href="{%url 'admin:index'%}">Админка</a></li>
