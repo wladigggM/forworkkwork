@@ -3,8 +3,9 @@ from django.shortcuts import render
 from django.views import View
 from django.views.generic import CreateView
 
-from users.forms import RegisterForm, LoginUser
-from users.models import PerformerProfile, CustomerProfile
+from .forms import RegisterForm, LoginUser
+from .models import PerformerProfile, CustomerProfile, User
+from .services import all_objects
 
 
 # Create your views here.
@@ -15,13 +16,7 @@ class RegisterView(CreateView):
 
     def form_valid(self, form):
         response = super().form_valid(form)
-        user = self.object
-        role = form.cleaned_data['role']
 
-        if role == 'Заказчик':
-            CustomerProfile.objects.create(user=user)
-        elif role == 'Исполнитель':
-            PerformerProfile.objects.create(user=user)
         return response
 
 
@@ -34,22 +29,35 @@ class LoginUserView(LoginView):
         return response
 
 
-class PerformerProfileView(View):
+class PerformerView(View):
     def get(self, request):
-        performer_users = PerformerProfile.objects.all()
-
         data = {
-            'performer_users': performer_users
+            'performer_users': all_objects(PerformerProfile.objects)
         }
 
         return render(request, 'users/performer/performer.html', data)
 
 
-class CustomerDashboard(View):
+class CustomerView(View):
     def get(self, request):
-        customer_users = CustomerProfile.objects.all()
-
         data = {
-            'customer_users': customer_users
+            'customer_users': all_objects(CustomerProfile.objects)
         }
         return render(request, 'customer.html', data)
+
+
+class ProfileView(View):
+    def get(self, request, user_id):
+        current_user = request.user
+        user_by_id = User.objects.get(id=user_id)
+
+        data = {
+            'user_by_id': user_by_id
+        }
+
+        if PerformerProfile.objects.filter(user=user_by_id).exists():
+            data['performer_info'] = PerformerProfile.objects.get(user=user_by_id)
+        elif CustomerProfile.objects.filter(user=current_user).exists():
+            data['customer_info'] = CustomerProfile.objects.get(user=user_by_id)
+
+        return render(request, 'users/profile/profile.html', data)

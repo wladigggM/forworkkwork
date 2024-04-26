@@ -2,6 +2,7 @@ from django.conf import settings
 from django.contrib.auth.models import AbstractUser
 from django.db import models
 
+from users.services import role_change_user
 
 
 # Create your models here.
@@ -22,34 +23,8 @@ class User(AbstractUser):
 
         super(User, self).save(*args, **kwargs)
 
-        if self.role == 'Заказчик':
+        role_change_user(self, PerformerProfile.objects, CustomerProfile.objects)
 
-            if PerformerProfile.objects.filter(user=self).exists():
-                PerformerProfile.objects.get(user=self).delete()
-
-            customer_profile, created = CustomerProfile.objects.get_or_create(user=self)
-
-            customer_profile.contact_info = self.email + ' DEFAULT CONTACT_INFO'
-            customer_profile.experience = 'DEFAULT EXPERIENCE'
-            customer_profile.save()
-
-        elif self.role == 'Исполнитель':
-
-            if CustomerProfile.objects.filter(user=self).exists():
-                CustomerProfile.objects.get(user=self).delete()
-
-            performer_profile, created = PerformerProfile.objects.get_or_create(user=self)
-
-            performer_profile.contact_info = self.email + ' DEFAULT CONTACT_INFO'
-            performer_profile.experience = 'DEFAULT EXPERIENCE'
-            performer_profile.save()
-
-        elif self.role is None:
-
-            if PerformerProfile.objects.filter(user=self).exists():
-                PerformerProfile.objects.get(user=self).delete()
-            elif CustomerProfile.objects.filter(user=self).exists():
-                CustomerProfile.objects.get(user=self).delete()
 
 
 class PerformerProfile(models.Model):
@@ -63,6 +38,7 @@ class PerformerProfile(models.Model):
     class Meta:
         verbose_name = 'Исполнитель'
         verbose_name_plural = 'Исполнители'
+
 
 class CustomerProfile(models.Model):
     user = models.OneToOneField(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)

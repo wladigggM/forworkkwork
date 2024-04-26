@@ -31,7 +31,10 @@
     <nav>
         <ul class="nav-links">
             <li><a href="/">Главная</a></li>
-            <li><a href="#">Категории</a></li>
+            {% if user.id != None %}
+            <li><a href="{% url 'users:profile' user_id=user.id%}">Профиль</a></li>
+            {% else %}
+            {% endif %}
             <li><a href="{% url 'users:performer' %}">Исполнители</a></li>
             <li><a href="#">Заказы</a></li>
             {% if user.is_staff %}
