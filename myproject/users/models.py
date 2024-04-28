@@ -1,30 +1,28 @@
 from django.conf import settings
 from django.contrib.auth.models import AbstractUser
-from django.db import models
+from django.db import models, transaction
 
-from users.services import role_change_user
+from users.services import create_all_profile
 
 
 # Create your models here.
 
 class User(AbstractUser):
     ROLE_CHOICES = [
-        ('Заказчик', 'Заказчик'),
-        ('Исполнитель', 'Исполнитель')
+        ('customer', 'customer'),
+        ('performer', 'performer')
     ]
 
-    role = models.CharField(max_length=30, choices=ROLE_CHOICES, default=None, null=True, blank=True)
+    role = models.CharField(max_length=30, choices=ROLE_CHOICES, default='customer', null=True, blank=True)
 
     class Meta:
         verbose_name = 'Пользователь'
         verbose_name_plural = 'Пользователи'
 
     def save(self, *args, **kwargs):
-
-        super(User, self).save(*args, **kwargs)
-
-        role_change_user(self, PerformerProfile.objects, CustomerProfile.objects)
-
+        with transaction.atomic():
+            super(User, self).save(*args, **kwargs)
+            create_all_profile(self, PerformerProfile.objects, CustomerProfile.objects)
 
 
 class PerformerProfile(models.Model):

@@ -2,17 +2,18 @@
 
 {% block content %}
 <section><h2>Исполнители</h2></section>
-    <div class="performer-user-cont">
-        {% for performer in performer_users %}
+<div class="performer-user-cont">
+    {% for performer in performer_users %}
+    <a href="{% url 'users:profile' role=performer.user.role user_id=performer.user.id%}">
         <div class="performer-user">
-            <a href="{% url 'users:profile' user_id=performer.user.id%}"></a>
-            <p>{{performer.user.role}}: {{performer.user.username}}</p>
+            <p>{{performer.user.username}}</p>
             <p>Имя: {{performer.user.first_name}}</p>
             <p>Фамилия: {{performer.user.last_name}}</p>
             <p>Опыт: {{performer.experience}}</p>
             <p>Контакты: {{performer.contact_info}}</p>
         </div>
-        {% endfor %}
-    </div>
+    </a>
+    {% endfor %}
+</div>
 
 {% endblock %}

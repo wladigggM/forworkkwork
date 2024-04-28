@@ -47,17 +47,30 @@ class CustomerView(View):
 
 
 class ProfileView(View):
-    def get(self, request, user_id):
-        current_user = request.user
+    def get(self, request, user_id, role):
         user_by_id = User.objects.get(id=user_id)
 
         data = {
-            'user_by_id': user_by_id
+            'user_by_id': user_by_id,
+            'role': role
         }
 
-        if PerformerProfile.objects.filter(user=user_by_id).exists():
-            data['performer_info'] = PerformerProfile.objects.get(user=user_by_id)
-        elif CustomerProfile.objects.filter(user=current_user).exists():
-            data['customer_info'] = CustomerProfile.objects.get(user=user_by_id)
+        if role == 'performer':
+            if PerformerProfile.objects.filter(user=user_by_id).exists():
+                data['performer_info'] = PerformerProfile.objects.get(user=user_by_id)
+                user_by_id.role = role
+                user_by_id.save()
+
+        elif role == 'customer':
+            if CustomerProfile.objects.filter(user=user_by_id).exists():
+                data['customer_info'] = CustomerProfile.objects.get(user=user_by_id)
+                user_by_id.role = role
+                user_by_id.save()
 
         return render(request, 'users/profile/profile.html', data)
+
+
+class PerformerProfileView(View):
+    def get(self, request, user_id, role):
+        user_by_id = User.objects.get(id=user_id)
+        ...

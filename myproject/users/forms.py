@@ -11,20 +11,15 @@ class LoginUser(AuthenticationForm):
 
 
 class RegisterForm(UserCreationForm):
-    ROLE_CHOICES = [
-        ('Заказчик', 'Заказчик'),
-        ('Исполнитель', 'Исполнитель')
-    ]
 
     username = forms.CharField(label="Имя пользователя")
     email = forms.EmailField(label="Электронная почта")
     password1 = forms.CharField(label="Пароль", widget=forms.PasswordInput)
     password2 = forms.CharField(label="Подтверждение пароля", widget=forms.PasswordInput)
-    role = forms.ChoiceField(label="Роль", choices=ROLE_CHOICES)
 
     class Meta:
         model = get_user_model()
-        fields = ['username', 'email', 'password1', 'password2', 'role']
+        fields = ['username', 'email', 'password1', 'password2']
 
 
 class PerformerProfileForm(forms.ModelForm):
